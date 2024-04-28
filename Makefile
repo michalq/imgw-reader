@@ -4,9 +4,9 @@ build:
 run:
 	./main
 
-.PHONY: docs docs-build
+.PHONY: docs docs-deploy
 docs:
 	mkdocs serve
 
-docs-build:
-	mkdocs build
+docs-deploy:
+	mkdocs gh-deploy
