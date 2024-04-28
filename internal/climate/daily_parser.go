@@ -52,7 +52,7 @@ func (r DailyParser) ParseLine(l []string) (*Daily, error) {
 	if err != nil {
 		return nil, err
 	}
-	day, err := strconv.Atoi(l[3])
+	day, err := strconv.Atoi(l[4])
 	if err != nil {
 		return nil, err
 	}

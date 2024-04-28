@@ -60,7 +60,7 @@ func main() {
 		panic(err)
 	}
 	wCsv := csv.NewWriter(f)
-	for _, d := range measurements.ByStation("252210160") {
+	for _, d := range measurements.ByStation("251200030") {
 		if err := wCsv.Write([]string{
 			d.StationId,
 			d.Date(),

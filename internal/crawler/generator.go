@@ -2,15 +2,14 @@ package crawler
 
 import (
 	"fmt"
-	"strconv"
 )
 
 func formatYearly(y int) Package {
 	return Package{
 		Type:     PackageYearly,
 		FileName: fmt.Sprintf("%d_k.zip", y),
-		Year:     strconv.Itoa(y),
-		Month:    "",
+		Year:     y,
+		Month:    0,
 	}
 }
 
@@ -18,8 +17,8 @@ func formatMonthly(y, m int) Package {
 	return Package{
 		Type:     PackageMonthly,
 		FileName: fmt.Sprintf("%d_%02d_k.zip", y, m),
-		Year:     strconv.Itoa(y),
-		Month:    strconv.Itoa(m),
+		Year:     y,
+		Month:    m,
 	}
 }
 

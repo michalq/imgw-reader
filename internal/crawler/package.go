@@ -11,6 +11,6 @@ const (
 type Package struct {
 	Type     PackageType
 	FileName string
-	Year     string
-	Month    string
+	Year     int
+	Month    int
 }
