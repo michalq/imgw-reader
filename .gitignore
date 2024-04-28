@@ -1,3 +1,5 @@
 raw/*
 out/*
 main
+identifier.sqlite
+.idea/*

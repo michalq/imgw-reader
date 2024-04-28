@@ -23,6 +23,8 @@ theme:
 nav:
   - Stations:
       - List: stations/list.md
+  - Measurements:
+      - Skierniewice: measurements/skierniewice.md
 plugins:
   - search
   - awesome-pages
