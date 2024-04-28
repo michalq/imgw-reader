@@ -1,5 +1,59 @@
 package climate
 
+import (
+	"fmt"
+	"time"
+)
+
+type List []Daily
+
+func (l List) ByStation(stationId string) List {
+	list := make(List, 0)
+	for _, d := range l {
+		if d.StationId == stationId {
+			list = append(list, d)
+		}
+	}
+	return list
+}
+
+func (l List) UniqueStations() []Station {
+	stationsMap := make(map[string]*Station)
+	for _, d := range l {
+		if station, ok := stationsMap[d.StationId]; ok {
+			if d.Time().Before(station.OldestMeasurement) {
+				station.OldestMeasurement = d.Time()
+			}
+			if d.Time().After(station.NewestMeasurement) {
+				station.NewestMeasurement = d.Time()
+			}
+			station.LongestWork = station.NewestMeasurement.Sub(station.OldestMeasurement)
+		} else {
+			station := Station{
+				Id:                d.StationId,
+				Name:              d.StationName,
+				OldestMeasurement: d.Time(),
+				NewestMeasurement: d.Time(),
+				LongestWork:       0 * time.Second,
+			}
+			stationsMap[d.StationId] = &station
+		}
+	}
+
+	stations := make([]Station, 0)
+	for _, s := range stationsMap {
+		stations = append(stations, *s)
+	}
+	return stations
+}
+
+type Station struct {
+	Id                string
+	Name              string
+	OldestMeasurement time.Time
+	NewestMeasurement time.Time
+	LongestWork       time.Duration
+}
 type Daily struct {
 	// StationId Kod stacji
 	StationId string
@@ -37,4 +91,14 @@ type Daily struct {
 	SnowHeight float32
 	// SnowHeightStatus Status pomiaru PKSN                     1
 	SnowHeightStatus MeasurementStatus
+}
+
+// Date formatted in Y-M-D
+func (d Daily) Date() string {
+	return fmt.Sprintf("%04d-%02d-%02d", d.Year, d.Month, d.Day)
+}
+
+func (d Daily) Time() time.Time {
+	t, _ := time.Parse("2006-01-02", d.Date())
+	return t
 }
