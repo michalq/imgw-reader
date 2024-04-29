@@ -64,7 +64,12 @@ func main() {
 		if err := wCsv.Write([]string{
 			d.StationId,
 			d.Date(),
+			strconv.Itoa(d.Year),
+			strconv.Itoa(d.Month),
+			strconv.Itoa(d.Day),
 			strconv.FormatFloat(float64(d.AvgTemp), 'f', -1, 32),
+			strconv.FormatFloat(float64(d.MaxTemp), 'f', -1, 32),
+			strconv.FormatFloat(float64(d.MinTemp), 'f', -1, 32),
 		}); err != nil {
 			panic(err)
 		}
