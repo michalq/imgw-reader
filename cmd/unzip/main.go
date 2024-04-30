@@ -74,5 +74,6 @@ func main() {
 			panic(err)
 		}
 	}
+	wCsv.Flush()
 	fmt.Println("\nMy job here is done, bye!")
 }

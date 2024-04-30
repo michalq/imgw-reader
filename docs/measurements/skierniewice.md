@@ -85,3 +85,16 @@ select y as year,
 from measurements
 group by y
 ```
+
+## Chart no.5
+<iframe title="January, Avg temp" aria-label="Interactive line chart" id="datawrapper-chart-symMW" src="https://datawrapper.dwcdn.net/symMW/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="429" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
+</script>
+<iframe title="February" aria-label="Interactive line chart" id="datawrapper-chart-symMW" src="https://datawrapper.dwcdn.net/symMW/3/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="429" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
+</script>
+
+```sqlite
+select y as year, avg(t) as avg_temp, max(tmax) max_temp
+from measurements
+where m=2
+group by y, m
+```
