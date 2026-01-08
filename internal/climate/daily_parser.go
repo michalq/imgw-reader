@@ -6,10 +6,12 @@ import (
 	"strconv"
 )
 
-type DailyParser struct{}
+type DailyParser struct {
+	parseLine func(l []string) (*Daily, error)
+}
 
-func NewDailyParser() DailyParser {
-	return DailyParser{}
+func NewDailyParser(parseLine func(l []string) (*Daily, error)) DailyParser {
+	return DailyParser{parseLine}
 }
 
 func (r DailyParser) ParseFromReader(reader *csv.Reader) ([]Daily, error) {
@@ -22,7 +24,7 @@ func (r DailyParser) ParseFromReader(reader *csv.Reader) ([]Daily, error) {
 		if err != nil {
 			return nil, err
 		}
-		l, err := r.ParseLine(record)
+		l, err := r.parseLine(record)
 		if err != nil {
 			return nil, err
 		}
@@ -34,7 +36,7 @@ func (r DailyParser) ParseFromReader(reader *csv.Reader) ([]Daily, error) {
 func (r DailyParser) ParseAll(all [][]string) ([]Daily, error) {
 	acqs := make([]Daily, 0, len(all))
 	for _, l := range all {
-		acq, err := r.ParseLine(l)
+		acq, err := r.parseLine(l)
 		if err != nil {
 			return nil, err
 		}
@@ -43,61 +45,10 @@ func (r DailyParser) ParseAll(all [][]string) ([]Daily, error) {
 	return acqs, nil
 }
 
-func (r DailyParser) ParseLine(l []string) (*Daily, error) {
-	year, err := strconv.Atoi(l[2])
-	if err != nil {
-		return nil, err
+func parseFloat(s string) (float64, error) {
+	if s == "" {
+		return 0, nil
 	}
-	month, err := strconv.Atoi(l[3])
-	if err != nil {
-		return nil, err
-	}
-	day, err := strconv.Atoi(l[4])
-	if err != nil {
-		return nil, err
-	}
-	maxTemp, err := strconv.ParseFloat(l[5], 32)
-	if err != nil {
-		return nil, err
-	}
-	minTemp, err := strconv.ParseFloat(l[7], 32)
-	if err != nil {
-		return nil, err
-	}
-	avgTemp, err := strconv.ParseFloat(l[9], 32)
-	if err != nil {
-		return nil, err
-	}
-	minGroungTemp, err := strconv.ParseFloat(l[11], 32)
-	if err != nil {
-		return nil, err
-	}
-	precipitation, err := strconv.ParseFloat(l[13], 32)
-	if err != nil {
-		return nil, err
-	}
-	snowHeight, err := strconv.ParseFloat(l[16], 32)
-	if err != nil {
-		return nil, err
-	}
-	return &Daily{
-		StationId:           l[0],
-		StationName:         l[1],
-		Year:                year,
-		Month:               month,
-		Day:                 day,
-		MaxTemp:             float32(maxTemp),
-		MaxTempStatus:       MeasurementStatus(l[6]),
-		MinTemp:             float32(minTemp),
-		MinTempStatus:       MeasurementStatus(l[8]),
-		AvgTemp:             float32(avgTemp),
-		AvgTempStatus:       MeasurementStatus(l[10]),
-		MinGroundTemp:       float32(minGroungTemp),
-		MinGroundTempStatus: MeasurementStatus(l[12]),
-		Precipitation:       float32(precipitation),
-		PrecipitationStatus: MeasurementStatus(l[14]),
-		PrecipitationType:   PrecipitationType(l[15]),
-		SnowHeight:          float32(snowHeight),
-		SnowHeightStatus:    MeasurementStatus(l[17]),
-	}, nil
+	return strconv.ParseFloat(s, 32)
+
 }

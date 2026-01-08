@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"encoding/csv"
 	"fmt"
+	"io"
+
 	"github.com/michalq/imgw/internal/climate"
 	"github.com/michalq/imgw/internal/crawler"
-	"io"
-	"os"
-	"strconv"
+	"github.com/michalq/imgw/internal/persist"
 )
 
 const path = "/Users/michalkutrzeba/work/climate"
@@ -17,26 +17,32 @@ func main() {
 	fmt.Println("Starting...")
 	zipReader := crawler.NewZipReader(path + "/raw")
 	climateData := crawler.NewClimate()
-	climateParser := climate.NewDailyParser()
+	climateParser := climate.NewDailyParser(climate.ParseClimateLine)
+
+	errs := make([]error, 0)
 
 	measurements := make(climate.List, 0)
 	for _, pckg := range climateData.Packages() {
 		for _, file := range zipReader.Files(pckg.FileName) {
-			if climate.IsClimateDailyFile(file.Name, pckg) {
+			if !climate.IsClimateDailyFile(file.Name, pckg) {
 				continue
 			}
+			fmt.Println("Reading ", file.Name)
 			rc, err := file.Open()
 			if err != nil {
-				panic(err)
+				errs = append(errs, fmt.Errorf("could not open file %s (%w)", file.Name, err))
+				continue
 			}
 			data, err := io.ReadAll(rc)
 			if err != nil {
-				panic(err)
+				errs = append(errs, fmt.Errorf("problem with reading file %s (%s)", file.Name, err))
+				continue
 			}
 			r := csv.NewReader(bytes.NewReader(data))
 			acqs, err := climateParser.ParseFromReader(r)
 			if err != nil {
-				panic(err)
+				errs = append(errs, fmt.Errorf("problem with parsing file %s (%s)", file.Name, err))
+				continue
 			}
 			measurements = append(measurements, acqs...)
 			fmt.Printf("Read %d daily measuremenets from package %s\n", len(acqs), pckg.FileName)
@@ -55,25 +61,14 @@ func main() {
 		)
 	}
 
-	f, err := os.Create(path + "/out/out.csv")
-	if err != nil {
-		panic(err)
-	}
-	wCsv := csv.NewWriter(f)
-	for _, d := range measurements.ByStation("251200030") {
-		if err := wCsv.Write([]string{
-			d.StationId,
-			d.Date(),
-			strconv.Itoa(d.Year),
-			strconv.Itoa(d.Month),
-			strconv.Itoa(d.Day),
-			strconv.FormatFloat(float64(d.AvgTemp), 'f', -1, 32),
-			strconv.FormatFloat(float64(d.MaxTemp), 'f', -1, 32),
-			strconv.FormatFloat(float64(d.MinTemp), 'f', -1, 32),
-		}); err != nil {
-			panic(err)
+	persist.ToCsv(path, measurements)
+
+	if len(errs) > 0 {
+		fmt.Printf("\nErrors encountered:\n")
+		for _, e := range errs {
+			fmt.Println(e)
 		}
 	}
-	wCsv.Flush()
+
 	fmt.Println("\nMy job here is done, bye!")
 }
