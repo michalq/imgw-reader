@@ -10,10 +10,9 @@ brew install uv
 # Help
 uv run python main.py -h
 
-# Plots lit
+# Plots list
 uv run python main.py list
 
 # Generate plot
-uv run python main.py generate \
-    --name month-year-by-year
+uv run python main.py generate --name month-year-by-year
 ```
