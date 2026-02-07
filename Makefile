@@ -1,10 +1,12 @@
 .PHONY: build run
+
+all: build
+
 build:
-	go build cmd/unzip/main.go
-run:
-	./main
+	go build -o synop_cli cmd/synop/main.go
 
 .PHONY: docs docs-deploy
+
 docs:
 	mkdocs serve
 

@@ -4,3 +4,5 @@ main
 identifier.sqlite
 .idea/*
 site/*
+
+synop_cli

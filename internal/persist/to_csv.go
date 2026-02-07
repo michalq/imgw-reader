@@ -9,7 +9,7 @@ import (
 )
 
 func ToCsv(path string, measurements climate.List) {
-	f, err := os.Create(path + "/out/out.csv")
+	f, err := os.Create(path)
 	if err != nil {
 		panic(err)
 	}
