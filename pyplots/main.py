@@ -3,6 +3,7 @@ import sqlite3
 
 from plots import PLOTS
 from plots.month_year_by_year import generate_month_year_by_year_plot
+from plots.average_yearly import generate_average_yearly
 
 parser = argparse.ArgumentParser()
 subparsers = parser.add_subparsers(dest="command")
