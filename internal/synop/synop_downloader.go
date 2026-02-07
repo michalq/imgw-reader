@@ -26,9 +26,11 @@ func SynopDataDownloader(debug bool, baseUrl, outFolder string) error {
 					if debug {
 						fmt.Println("Downloading", fileUrl)
 					}
-					if err := downloadFile(fileUrl, outFolder); err != nil {
-						errs = append(errs, fmt.Errorf("download file %s error: %v", fileUrl, err))
-					}
+					go func(fileUrl string) {
+						if err := downloadFile(fileUrl, outFolder); err != nil {
+							errs = append(errs, fmt.Errorf("download file %s error: %v", fileUrl, err))
+						}
+					}(fileUrl)
 				}
 			})
 			if err := data.Visit(fileUrl); err != nil {
