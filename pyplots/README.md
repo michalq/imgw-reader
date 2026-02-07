@@ -14,5 +14,6 @@ uv run python main.py -h
 uv run python main.py list
 
 # Generate plot
-uv run python main.py generate --name month-year-by-year
+uv run python main.py month-year-by-year --month 1 
+uv run python main.py average-yearly
 ```
