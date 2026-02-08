@@ -33,13 +33,17 @@ func ParseSynopLine(l []string) (*Daily, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error parsing avgTemp: %w", err)
 	}
-	minGroungTemp, err := parseFloat(l[11])
+	minGroundTemp, err := parseFloat(l[11])
 	if err != nil {
-		return nil, fmt.Errorf("error parsing minGroungTemp: %w", err)
+		return nil, fmt.Errorf("error parsing minGroundTemp: %w", err)
 	}
 	precipitation, err := parseFloat(l[13])
 	if err != nil {
 		return nil, fmt.Errorf("error parsing precipitation: %w, (%+v)", err, l[13])
+	}
+	snowDepthCm, err := parseFloat(l[16])
+	if err != nil {
+		return nil, fmt.Errorf("error parsing snow depth: %w, (%+v)", err, l[16])
 	}
 
 	stationName, err := charmap.Windows1250.NewDecoder().
@@ -60,12 +64,12 @@ func ParseSynopLine(l []string) (*Daily, error) {
 		MinTempStatus:       MeasurementStatus(l[8]),
 		AvgTemp:             float32(avgTemp),
 		AvgTempStatus:       MeasurementStatus(l[10]),
-		MinGroundTemp:       float32(minGroungTemp),
+		MinGroundTemp:       float32(minGroundTemp),
 		MinGroundTempStatus: MeasurementStatus(l[12]),
 		Precipitation:       float32(precipitation),
 		PrecipitationStatus: MeasurementStatus(l[14]),
 		PrecipitationType:   PrecipitationType(l[15]),
-		SnowHeight:          0,
-		SnowHeightStatus:    MeasurementStatus(l[17]),
+		SnowDepthCm:         float32(snowDepthCm),
+		SnowDepthStatus:     MeasurementStatus(l[17]),
 	}, nil
 }

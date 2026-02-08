@@ -69,7 +69,7 @@ func ParseClimateLine(l []string) (*Daily, error) {
 		Precipitation:       float32(precipitation),
 		PrecipitationStatus: MeasurementStatus(l[14]),
 		PrecipitationType:   PrecipitationType(l[15]),
-		SnowHeight:          float32(snowHeight),
-		SnowHeightStatus:    MeasurementStatus(l[17]),
+		SnowDepthCm:         float32(snowHeight),
+		SnowDepthStatus:     MeasurementStatus(l[17]),
 	}, nil
 }

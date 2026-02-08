@@ -87,10 +87,10 @@ type Daily struct {
 	PrecipitationStatus MeasurementStatus
 	// PrecipitationType Rodzaj opadu  [S/W/ ]
 	PrecipitationType PrecipitationType
-	// SnowHeight Wysokość pokrywy śnieżnej [cm]
-	SnowHeight float32
-	// SnowHeightStatus Status pomiaru PKSN                     1
-	SnowHeightStatus MeasurementStatus
+	// SnowDepthCm Wysokość pokrywy śnieżnej [cm]
+	SnowDepthCm float32
+	// SnowDepthStatus Status pomiaru PKSN                     1
+	SnowDepthStatus MeasurementStatus
 }
 
 // Date formatted in Y-M-D

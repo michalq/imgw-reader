@@ -38,7 +38,9 @@ create table measurements
     d         integer,
     t         float,
     tmax      float,
-    tmin      float
+    tmin      float,
+    precipitation_mm float,
+	snow_depth_cm float
 );
 
 drop table if exists stations;
@@ -63,12 +65,12 @@ func (s *SqliteMeasurementsRepository) AddMeasurements(
 	if err != nil {
 		return fmt.Errorf("failed to start transaction: %w", err)
 	}
-	stmt, err := tx.Prepare(`insert into measurements (stationId, day, y, m, d, t, tmax, tmin) values (?, ?, ?, ?, ?, ?, ?, ?)`)
+	stmt, err := tx.Prepare(`insert into measurements (stationId, day, y, m, d, t, tmax, tmin, precipitation_mm, snow_depth_cm) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
 	if err != nil {
 		return fmt.Errorf("failed to prepare statement: %w", err)
 	}
 	for _, daily := range measurements {
-		_, err := stmt.Exec(daily.StationId, daily.Date(), daily.Year, daily.Month, daily.Day, daily.AvgTemp, daily.MaxTemp, daily.MinTemp)
+		_, err := stmt.Exec(daily.StationId, daily.Date(), daily.Year, daily.Month, daily.Day, daily.AvgTemp, daily.MaxTemp, daily.MinTemp, daily.Precipitation, daily.SnowDepthCm)
 		if err != nil {
 			return fmt.Errorf("failed to insert measurement: %w", err)
 		}
