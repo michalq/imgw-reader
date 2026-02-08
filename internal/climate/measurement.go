@@ -5,6 +5,10 @@ type (
 	PrecipitationType string
 )
 
+func (s MeasurementStatus) Available() bool {
+	return s != NoMeasurement
+}
+
 const (
 	// NoMeasurement Status "8" brak pomiaru
 	NoMeasurement MeasurementStatus = "8"

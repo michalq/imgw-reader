@@ -4,6 +4,8 @@ import sqlite3
 from plots import PLOTS
 from plots.month_year_by_year import setup_month_year_by_year_plot
 from plots.average_yearly import generate_average_yearly
+from plots.snow_depth_in_month_yearly import setup_snow_depth_in_month_yearly
+from plots.precipitation_in_month_yearly import setup_precipitation_in_month_yearly
 
 parser = argparse.ArgumentParser()
 subparsers = parser.add_subparsers(dest="command")
