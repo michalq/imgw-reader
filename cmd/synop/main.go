@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/michalq/imgw/internal/adapters"
+	"github.com/michalq/imgw/internal/config"
 	"github.com/michalq/imgw/internal/persist"
 	"github.com/michalq/imgw/internal/synop"
 
@@ -14,9 +16,15 @@ import (
 
 const debug = true
 const baseSynopData = "https://danepubliczne.imgw.pl/data/dane_pomiarowo_obserwacyjne/dane_meteorologiczne/dobowe/synop/"
+const configPath = "common_config.json"
 
 func main() {
 	ctx := context.Background()
+	cfg, err := config.Read(configPath)
+	if err != nil {
+		panic(err)
+	}
+
 	cmd := &cli.Command{
 		Commands: []*cli.Command{
 			{
@@ -39,8 +47,8 @@ func main() {
 				},
 			},
 			{
-				Name:  "scan",
-				Usage: "Scans all IMGW data from 'dobowe/synop' and creates single CSV file.",
+				Name:  "import",
+				Usage: "Scans all IMGW data from 'dobowe/synop' and saves to csv or database.",
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:     "raw-dir",
@@ -56,28 +64,37 @@ func main() {
 					},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
+					// Input
 					outFolder := c.String("raw-dir")
 					outFile := c.String("out")
-
-					measurements, err := synop.SynopScanner(debug, outFolder)
+					// Dependencies
+					sqliteDb, err := adapters.ProviderSqlite(cfg.Db.Url)
 					if err != nil {
 						panic(err)
 					}
-
-					fmt.Printf("\nRead %d daily measurements!\n", len(measurements))
-					fmt.Printf("\nStations\n")
-					fmt.Printf("Id,Name,Oldest measurement,Newest measurement,Longest work\n")
-					for _, s := range measurements.UniqueStations() {
-						fmt.Printf("%s,%s,%s,%s,%d\n",
-							s.Id,
-							s.Name,
-							s.OldestMeasurement.Format("2006-01-02"),
-							s.NewestMeasurement.Format("2006-01-02"),
-							int(s.LongestWork.Seconds()),
-						)
+					measurementsRepo := adapters.NewSqliteMeasurementsRepository(sqliteDb)
+					persisters := []persist.Persister{
+						persist.NewCsvPersister(outFile),
+						persist.NewDatabasePersister(measurementsRepo),
 					}
-
-					persist.ToCsv(outFile, measurements)
+					// Import & persist
+					measurements, err := synop.SynopScanner(debug, outFolder)
+					if err != nil {
+						log.Fatalf("failed to scan measurements: %v", err)
+					}
+					fmt.Printf("\nRead %d daily measurements!\n", len(measurements))
+					stations := measurements.UniqueStations()
+					for _, p := range persisters {
+						if err := p.Setup(ctx); err != nil {
+							log.Fatalf("cannot setup persister: %+v", err)
+						}
+						if err := p.Persist(ctx, measurements); err != nil {
+							log.Fatalf("cannot persist measurements %+v", err)
+						}
+						if err := p.PersistStations(ctx, stations); err != nil {
+							log.Fatalf("cannot persist measurements %+v", err)
+						}
+					}
 					return nil
 				},
 			},

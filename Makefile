@@ -1,12 +1,14 @@
-.PHONY: build run
+.PHONY: all clean
 
-all: build
+all: clean synop_cli
 
-build:
-	go build -o synop_cli cmd/synop/main.go
+clean:
+	@rm ./synop_cli || true
+
+synop_cli:
+	@go build -o synop_cli cmd/synop/main.go
 
 .PHONY: docs docs-deploy
-
 docs:
 	mkdocs serve
 

@@ -14,10 +14,8 @@ We then need to import it to sqlite.
 
 ```
 ./synop_cli download --raw-dir ./raw/synop
-./synop_cli scan --raw-dir ./raw/synop --out ./out/out.csv
+./synop_cli import --raw-dir ./raw/synop --out ./out/out.csv
 ```
-
-TODO: add to sqlite - currently it must be done manually.
 
 # Generating plots
 
